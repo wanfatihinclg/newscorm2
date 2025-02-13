@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('scorm_type')->default('local');
             $table->string('reference');
-            $table->string('version', 9);
+            $table->string('version');
             $table->float('max_grade')->default(0);
             $table->integer('max_attempt')->default(1);
             $table->string('sha1_hash', 40)->nullable();

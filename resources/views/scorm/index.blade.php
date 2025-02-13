@@ -6,6 +6,47 @@
     <title>SCORM Packages</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+        .pagination {
+            margin-bottom: 0;
+        }
+        .pagination .page-link {
+            padding: 0.375rem 0.75rem;
+            position: relative;
+            display: block;
+            color: #0d6efd;
+            text-decoration: none;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+        .pagination .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #fff;
+            border-color: #dee2e6;
+        }
+        .pagination .page-link:hover {
+            z-index: 2;
+            color: #0a58ca;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
+        .pagination-info {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        .table > :not(caption) > * > * {
+            padding: 0.75rem;
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -21,17 +62,17 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table">
+                    <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
                                 <th>Name</th>
                                 <th>Version</th>
                                 <th>Type</th>
-                                <th>Actions</th>
+                                <th width="150">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($scorms as $scorm)
+                            @forelse($scorms as $scorm)
                                 <tr>
                                     <td>{{ $scorm->name }}</td>
                                     <td>{{ $scorm->version }}</td>
@@ -47,10 +88,23 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">No SCORM packages found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
+                
+                @if($scorms->hasPages())
+                    <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
+                        <div class="pagination-info">
+                            Showing {{ $scorms->firstItem() }} to {{ $scorms->lastItem() }} of {{ $scorms->total() }} entries
+                        </div>
+                        {{ $scorms->links('vendor.pagination.bootstrap-5') }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>

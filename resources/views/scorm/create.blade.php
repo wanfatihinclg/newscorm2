@@ -75,9 +75,9 @@
             }
             
             // Check file size (max 100MB)
-            const maxSize = 100 * 1024 * 1024; // 100MB in bytes
+            const maxSize = 512 * 1024 * 1024; // 100MB in bytes
             if (fileInput.files[0].size > maxSize) {
-                alert('File is too large. Maximum size is 100MB.');
+                alert('File is too large. Maximum size is 500MB.');
                 return;
             }
             

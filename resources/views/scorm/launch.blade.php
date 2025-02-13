@@ -13,10 +13,12 @@
             overflow: hidden;
             height: 100vh;
             background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
         }
         #scorm-container {
             width: 100%;
-            height: calc(100vh - 150px);
+            flex: 1;
             border: none;
         }
         .nav-bar {
@@ -27,6 +29,7 @@
             align-items: center;
             padding: 0 20px;
             justify-content: space-between;
+            flex-shrink: 0;
         }
         .nav-title {
             font-size: 18px;

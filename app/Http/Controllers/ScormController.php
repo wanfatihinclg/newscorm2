@@ -26,7 +26,7 @@ class ScormController extends Controller
 
     public function index()
     {
-        $scorms = Scorm::with('course')->paginate(70);
+        $scorms = Scorm::with('course')->paginate(10);
         return view('scorm.index', compact('scorms'));
     }
 
