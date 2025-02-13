@@ -172,40 +172,54 @@ class ScormService
         }
     }
 
-    protected function processItems($items, Scorm $scorm, $organization, $parent, $resources, $sortOrder = 0)
+    protected function processItems($items, Scorm $scorm, $organization, $parent = null, $resources = [], &$sortOrder = 0)
     {
         foreach ($items as $item) {
             $identifier = $item->getAttribute('identifier');
             $title = $item->getElementsByTagName('title')->item(0)?->nodeValue ?? $identifier;
             $launch = '';
+            $parameters = '';
             $scormType = 'asset';
             
             // Get identifierref to find the resource
             $identifierref = $item->getAttribute('identifierref');
             if ($identifierref && isset($resources[$identifierref])) {
                 $resource = $resources[$identifierref];
-                // Strip query parameters from launch URL
-                $launch = preg_replace('/\?.*$/', '', $resource['href']);
+                // Split URL and parameters
+                $url = $resource['href'];
+                
+                if (strpos($url, '?') !== false) {
+                    list($url, $parameters) = explode('?', $url, 2);
+                }
+                
+                $launch = $url;
                 $scormType = $resource['scormType'];
             }
 
             // Create SCO record
             $sco = new ScormSco();
             $sco->scorm_id = $scorm->id;
-            $sco->manifest = 'imsmanifest.xml';
+            $sco->manifest = $organization;
             $sco->organization = $organization;
             $sco->parent = $parent;
             $sco->identifier = $identifier;
             $sco->launch = $launch;
             $sco->scorm_type = $scormType;
             $sco->title = $title;
+            $sco->parameters = $parameters;
             $sco->sort_order = $sortOrder++;
             $sco->save();
 
             // Process child items recursively
-            $childItems = $item->getElementsByTagName('item');
-            if ($childItems->length > 0) {
-                $this->processItems($childItems, $scorm, $organization, $identifier, $resources, $sortOrder);
+            if ($item->getElementsByTagName('item')->length > 0) {
+                $this->processItems(
+                    $item->getElementsByTagName('item'),
+                    $scorm,
+                    $organization,
+                    $identifier,
+                    $resources,
+                    $sortOrder
+                );
             }
         }
     }

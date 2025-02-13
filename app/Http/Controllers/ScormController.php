@@ -26,7 +26,7 @@ class ScormController extends Controller
 
     public function index()
     {
-        $scorms = Scorm::with('course')->paginate(10);
+        $scorms = Scorm::with('course')->paginate(70);
         return view('scorm.index', compact('scorms'));
     }
 
@@ -76,8 +76,7 @@ class ScormController extends Controller
 
     public function launch(Scorm $scorm, ScormSco $sco)
     {
-        // Validate that the SCO belongs to the SCORM package
-        if ($sco->scorm_id !== $scorm->id) {
+        if (!$sco->launch) {
             abort(404);
         }
 
@@ -92,8 +91,7 @@ class ScormController extends Controller
         if (!$attempt) {
             $attempt = ScormAttempt::create([
                 'scorm_id' => $scorm->id,
-                'started_at' => now(),
-                'status' => 'not attempted'
+                'attempt' => 1
             ]);
         }
 
@@ -102,8 +100,12 @@ class ScormController extends Controller
             abort(404, 'SCORM content file not found');
         }
         
-        // Convert to URL
+        // Convert to URL and add parameters if they exist
         $launchUrl = asset('scorm_files/' . $scorm->reference . '/' . $launchFile);
+        if (!empty($sco->parameters)) {
+            $connector = (strpos($launchUrl, '?') !== false) ? '&' : '?';
+            $launchUrl .= $connector . ltrim($sco->parameters, '?&');
+        }
 
         return view('scorm.launch', compact(
             'scorm',

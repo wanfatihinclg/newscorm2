@@ -36,4 +36,19 @@ class ScormSco extends Model
     {
         return $this->hasMany(ScormScoValue::class);
     }
+
+    public function getLaunchUrlAttribute()
+    {
+        if (empty($this->launch)) {
+            return null;
+        }
+
+        $url = $this->launch;
+        if (!empty($this->parameters)) {
+            $connector = (strpos($url, '?') !== false) ? '&' : '?';
+            $url .= $connector . ltrim($this->parameters, '?&');
+        }
+
+        return $url;
+    }
 }
